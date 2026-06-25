@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌍 Global Time Converter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #101820;
+      color: #f1f1f1;
+      text-align: center;
+      margin-top: 50px;
+    }
+    h1 { color: #00e0ff; }
+    .box {
+      background: #1b2735;
+      padding: 20px;
+      border-radius: 15px;
+      width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px #00e0ff;
+    }
+    p { font-size: 18px; line-height: 1.5; }
+    input {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      width: 80%;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌍 Global Time Converter</h1>
+  <div class="box">
+    <p><b>Local Time:</b> <span id="local"></span></p>
+    <p><b>UTC Time:</b> <span id="utc"></span></p>
+    <p><b>ISO Format:</b> <span id="iso"></span></p>
+    <p><b>Unix (ms):</b> <span id="unixms"></span></p>
+    <p><b>Unix (sec):</b> <span id="unixsec"></span></p>
+
+    <hr>
+    <h3>🌏 Convert Any Timezone</h3>
+    <input id="tz" placeholder="e.g. Asia/Karachi or America/New_York">
+    <p><b>Converted Time:</b> <span id="converted"></span></p>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+
+      document.getElementById("local").innerText = now.toLocaleString();
+      document.getElementById("utc").innerText = now.toUTCString();
+      document.getElementById("iso").innerText = now.toISOString();
+      document.getElementById("unixms").innerText = Date.now();
+      document.getElementById("unixsec").innerText = Math.floor(Date.now() / 1000);
+    }
+
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    const tzInput = document.getElementById("tz");
+    tzInput.addEventListener("input", () => {
+      try {
+        const tz = tzInput.value.trim();
+        const now = new Date();
+        const options = { timeZone: tz, hour12: false };
+        const converted = now.toLocaleString("en-US", options);
+        document.getElementById("converted").innerText = converted;
+      } catch (e) {
+        document.getElementById("converted").innerText = "Invalid timezone";
+      }
+    });
+  </script>
+</body>
+</html>

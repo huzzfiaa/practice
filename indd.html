@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+   const debounce = (fn, delay = 1000) => {
+  let timer;
+
+  return function (...args) {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+};
+
+function sec() {
+  console.log("object");
+}
+
+const debouncedSec = debounce(sec, 2000);
+
+debouncedSec(); // Call it
+
+
+
+function outer() {
+  let count=0
+  return function inner() {
+    count++
+  }
+}
+const bb =outer()
+bb()1//
+
+
+
+bb()2//
+bb()3//
+
+
+
+function multiply(a,d) {
+  return a*d
+  
+}
+multiply(43,54)
+
+
+    </script>
+</body>
+</html>

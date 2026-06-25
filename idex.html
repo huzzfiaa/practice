@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1 id="text">323d5@ed4dew3</h1>
+    <button id="btn"> copythis shit</button>
+
+
+    <script>
+        let  tex = document.querySelector("#text")
+        let btn=document.querySelector("#btn")
+  btn.addEventListener("click", async function () {
+        try {
+            await navigator.clipboard.writeText(tex.textContent);
+            btn.innerText = "Copied!";
+        } catch (err) {
+            console.log("Copy failed:", err);
+        }
+    });
+    </script>
+</body>
+</html>

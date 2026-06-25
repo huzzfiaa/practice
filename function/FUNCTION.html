@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Premium Text Animation</title>
+<style>
+  /* ---------- Base reset ---------- */
+  :root{
+    --bg1: #05060a;
+    --bg2: #081029;
+    --glow: #00e0ff;
+    --accent: #ff6ec7;
+    --metal-left: rgba(255,255,255,0.06);
+    --metal-right: rgba(0,0,0,0.25);
+    --glass: rgba(255,255,255,0.04);
+    --text-size: clamp(36px, 8vw, 120px);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background: radial-gradient(1200px 700px at 10% 10%, rgba(0,160,255,0.06), transparent),
+                radial-gradient(900px 500px at 90% 90%, rgba(255,110,199,0.04), transparent),
+                linear-gradient(180deg,var(--bg1),var(--bg2));
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color: #fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+  }
+
+  /* ---------- Stage ---------- */
+  .card{
+    width:min(1100px, 94vw);
+    padding:48px;
+    border-radius:20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    box-shadow:
+      0 6px 30px rgba(2,6,23,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.02);
+    display:grid;
+    grid-template-columns: 1fr 320px;
+    gap:28px;
+    align-items:center;
+    transform-style:preserve-3d;
+    perspective:1200px;
+  }
+
+  /* ---------- Headline container ---------- */
+  .headline-wrap{
+    padding:12px 16px;
+  }
+
+  /* Big text with mask + metallic sheen + glow */
+  .hero{
+    font-weight:800;
+    font-size:var(--text-size);
+    line-height:0.95;
+    letter-spacing: -2px;
+    margin:0;
+    position:relative;
+    display:inline-block;
+    -webkit-text-stroke: 0.6px rgba(0,0,0,0.45);
+    text-transform:uppercase;
+    color: transparent;
+    background: linear-gradient(90deg, var(--accent), #ffd36d 30%, var(--glow) 60%, #ffffff 100%);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 5s linear infinite;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6));
+  }
+
+  /* subtle metallic overlay using pseudo element */
+  .hero::after{
+    content: "";
+    position:absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.06), transparent 20%, rgba(0,0,0,0.18));
+    mix-blend-mode: overlay;
+    border-radius: 6px;
+    pointer-events:none;
+  }
+
+  /* 3D extrusion via text-shadow layers (cheap but effective) */
+  .hero.extrude{
+    text-shadow:
+      0 1px 0 rgba(255,255,255,0.02),
+      0 2px 0 rgba(0,0,0,0.08),
+      0 6px 20px rgba(0,0,0,0.45);
+  }
+
+  @keyframes shimmer{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+
+  /* small tagline */
+  .tag{
+    margin-top:14px;
+    color: #cfeefb;
+    opacity:0.85;
+    font-weight:600;
+    letter-spacing:0.6px;
+  }
+
+  /* right column - controls + sparkle canvas */
+  .panel{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:stretch;
+  }
+
+  .card-panel{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  }
+
+  label{font-size:13px;color:#bcdff6;display:block;margin-bottom:6px}
+  input[type="text"], select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+    color: #e9f8ff;
+    outline:none;
+    font-size:14px;
+  }
+
+  .controls{display:flex;gap:8px;margin-top:8px}
+  button{
+    padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--glow),var(--accent));
+    color:#001018;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(0,160,255,0.12);
+  }
+
+  .small{font-size:13px;color:#98d3f1;opacity:0.9}
+
+  /* decorative underline */
+  .underline{
+    height:6px;border-radius:999px;margin-top:18px;
+    background:linear-gradient(90deg,var(--glow),transparent,var(--accent));
+    width:70%;
+    opacity:0.7;
+  }
+
+  /* canvas for particles sits behind panel but inside card */
+  canvas.spark {
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    border-radius:20px;
+  }
+
+  /* responsive */
+  @media (max-width:920px){
+    .card{grid-template-columns:1fr; padding:28px}
+    .panel{order:2}
+    canvas.spark{display:none} /* hide fancy particles on small screens */
+  }
+
+  /* subtle hover tilt */
+  .card:hover{ transform: translateY(-6px) rotateX(2deg); transition:transform 300ms ease; }
+</style>
+</head>
+<body>
+  <div class="card" id="card" role="region" aria-label="Premium text animation demo">
+    <canvas class="spark" id="spark"></canvas>
+
+    <div class="headline-wrap">
+      <h1 class="hero extrude" id="hero" aria-live="polite">10,000,000,000</h1>
+      <div class="tag" id="tag">Worth-a-Million-Million — Premium Shimmer Text</div>
+      <div class="underline" aria-hidden="true"></div>
+    </div>
+
+    <div class="panel">
+      <div class="card-panel">
+        <label for="text">Text</label>
+        <input id="text" type="text" value="10,000,000,000" maxlength="60" />
+        <label for="fontSize">Size (visual scaling)</label>
+        <select id="fontSize" aria-label="Font size">
+          <option value="1">Normal</option>
+          <option value="1.2">Big</option>
+          <option value="1.6" selected>Premium</option>
+          <option value="2">Huge</option>
+        </select>
+
+        <div class="controls" style="margin-top:12px">
+          <button id="btnShine">Toggle Shine</button>
+          <button id="btnSpark">Toggle Sparks</button>
+        </div>
+        <p class="small" style="margin-top:10px">Tip: Click the text to trigger a quick particle burst. Resize window to see responsive behavior.</p>
+      </div>
+
+      <div class="card-panel" style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;">
+        <div class="small">Designed with: CSS gradients, text-mask shimmer, canvas sparks</div>
+        <div class="small">Accessible + Lightweight — No libraries</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---------- Simple interaction + particle sparks ---------- */
+const hero = document.getElementById('hero');
+const input = document.getElementById('text');
+const fontSize = document.getElementById('fontSize');
+const btnShine = document.getElementById('btnShine');
+const btnSpark = document.getElementById('btnSpark');
+const canvas = document.getElementById('spark');
+const ctx = canvas.getContext('2d');
+
+let sparkleEnabled = true;
+let shimmerRunning = true;
+let particles = [];
+let rafId = null;
+
+/* update text */
+input.addEventListener('input', e => {
+  hero.textContent = e.target.value || ' ';
+});
+
+/* font size control */
+fontSize.addEventListener('change', e => {
+  const scale = parseFloat(e.target.value);
+  hero.style.fontSize = `calc(var(--text-size) * ${scale})`;
+});
+
+/* toggle shine (CSS animation) */
+btnShine.addEventListener('click', () => {
+  shimmerRunning = !shimmerRunning;
+  hero.style.animationPlayState = shimmerRunning ? 'running' : 'paused';
+  btnShine.textContent = shimmerRunning ? 'Pause Shine' : 'Resume Shine';
+});
+
+/* toggle sparks */
+btnSpark.addEventListener('click', () => {
+  sparkleEnabled = !sparkleEnabled;
+  btnSpark.textContent = sparkleEnabled ? 'Disable Sparks' : 'Enable Sparks';
+  if (sparkleEnabled) startLoop(); else stopLoop();
+});
+
+/* burst on click */
+hero.addEventListener('click', e => {
+  const rect = hero.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  burst(x, y, 80);
+});
+
+/* resize canvas to card size */
+function resizeCanvas() {
+  const card = document.getElementById('card');
+  canvas.width = card.clientWidth * devicePixelRatio;
+  canvas.height = card.clientHeight * devicePixelRatio;
+  canvas.style.width = card.clientWidth+'px';
+  canvas.style.height = card.clientHeight+'px';
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+/* particle helpers */
+function rand(min,max){ return Math.random()*(max-min)+min }
+
+function spawn(x,y){
+  // create a tiny particle
+  return {
+    x, y,
+    vx: rand(-2.5,2.5),
+    vy: rand(-6,-1),
+    life: rand(60,120),
+    size: rand(1,3),
+    hue: rand(170,320),
+    alpha: 1
+  };
+}
+
+function burst(clientX, clientY, count=40){
+  // convert client coords to canvas local
+  const cardRect = document.getElementById('card').getBoundingClientRect();
+  const localX = (clientX - cardRect.left);
+  const localY = (clientY - cardRect.top);
+  for(let i=0;i<count;i++) particles.push(spawn(localX,localY));
+  startLoop();
+}
+
+/* animation loop */
+function startLoop(){
+  if(rafId) return;
+  let t=0;
+  function loop(){
+    rafId = requestAnimationFrame(loop);
+    t++;
+    // clear with subtle fade
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // draw particles
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.x += p.vx;
+      p.vy += 0.12; // gravity
+      p.y += p.vy;
+      p.life--;
+      p.alpha = Math.max(0, p.life / 120);
+      // glow
+      ctx.beginPath();
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size*6);
+      g.addColorStop(0, `hsla(${p.hue},90%,65%,${p.alpha})`);
+      g.addColorStop(0.6, `hsla(${p.hue},80%,50%,${p.alpha*0.6})`);
+      g.addColorStop(1, `rgba(0,0,0,0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(p.x-p.size*6, p.y-p.size*6, p.size*12, p.size*12);
+      // small spark
+      ctx.fillStyle = `rgba(255,255,255,${p.alpha})`;
+      ctx.fillRect(p.x, p.y, Math.max(1,p.size), Math.max(1,p.size));
+      if(p.life <= 0 || p.y > canvas.height+50) particles.splice(i,1);
+    }
+    // stop if no particles and sparks disabled
+    if(particles.length === 0 && !sparkleEnabled){
+      stopLoop();
+    }
+  }
+  loop();
+}
+
+function stopLoop(){
+  if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+}
+
+/* initial tiny ambient bursts */
+setTimeout(()=>{ burst(canvas.width/2, canvas.height/2, 24) }, 600);
+
+/* tiny hover parallax for 3D feel */
+const card = document.getElementById('card');
+card.addEventListener('mousemove', e => {
+  const r = card.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top + r.height/2;
+  const dx = (e.clientX - cx) / r.width;
+  const dy = (e.clientY - cy) / r.height;
+  const rx = dy * 6;
+  const ry = dx * -10;
+  card.style.transform = `translateY(-6px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+});
+card.addEventListener('mouseleave', ()=> card.style.transform = 'translateY(-6px) rotateX(2deg)');
+
+/* accessibility: announce changes */
+const tag = document.getElementById('tag');
+input.addEventListener('change', () => {
+  tag.textContent = "Preview: " + input.value;
+});
+
+/* start looping if enabled */
+if (sparkleEnabled) startLoop();
+
+</script>
+</body>
+</html>
